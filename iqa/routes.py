@@ -5,6 +5,7 @@ import os
 import shutil
 from flask import Flask, flash, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -54,7 +55,6 @@ def upload_file():
         images = request.files.getlist("file")
         
         for image in images:
-
             if image.filename == '':
                 flash('You need to select atleast one image to get the results.')
                 return redirect(request.url)
@@ -67,6 +67,15 @@ def upload_file():
                 return redirect(request.url)
         
         good_images, bad_images, image_suggested_for_deletion = main()
+
+        for good_image in good_images:
+            FileStorage().save(os.path.join(GOOD_IMAGES_PATH, good_image))
+        
+        for bad_image in bad_images:
+            FileStorage().save(os.path.join(BAD_IMAGES_PATH, bad_image))
+        
+        for image_deletion in image_suggested_for_deletion:
+            FileStorage().save(os.path.join(IMAGE_SUGGESTED_FOR_DELETION_PATH, image_deletion))
         
         return redirect(url_for('results'))
 
@@ -75,3 +84,7 @@ def upload_file():
 @app.route('/results')
 def results():
     return render_template('results.html', goodImages=good_images, badImages=bad_images, imageSuggestedForDeletion=image_suggested_for_deletion)
+
+@app.route('/uploads/<name>')
+def uploads(name):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], name)

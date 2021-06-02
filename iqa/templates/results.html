@@ -14,25 +14,64 @@
     ></script>
     <meta charset="utf-8" />
     <title>Results</title>
+    <style>
+      img {
+        width: 200px;
+        height: 150px;
+      }
+    </style>
   </head>
 
-  <body>
-    <h1>Good Images</h1>
-    {% for image in goodImages %}
-    <p>Hello {{ goodImage }}</p>
-    <img src="{{ url_for('static', filename='images/'+image) }} " />
-    {% endfor %}
+  <body style="background-color: #f4f4f4">
+    <div class="navbar navbar-dark bg-dark">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1" id="div1">No Reference Image Quality Assessment</span>
+      </div>
+    </div>
+    <br />
+    <div style="margin-left: 20px">
+      <h2>Good Images</h2>
+      {% set counter = 0 %} {% for image in goodImages %} {% if counter == 0 %}
+      <tr>
+        {% endif %}
+        <td>
+          <a href="/uploads/{{ image }}" target="_blank"><img src="{{ url_for('static', filename='images/'+image) }} " /></a>
+        </td>
+        <!-- <img src="{{ url_for('static', filename='images/'+image) }} " />
+        <p>Hello {{ image }}</p> -->
+        {% if counter == 10 %} {% set counter = 0 %}
+      </tr>
+      {% endif %} {% endfor %}
+    </div>
 
-    <h1>Bad Images</h1>
-    {% for image in badImages %}
-    <p>Hello {{ badImage }}</p>
-    <img src="{{ url_for('static', filename='images/'+image) }} " />
-    {% endfor %}
+    <br />
+    <br />
+    <div style="margin-left: 20px">
+      <h2>Bad Images</h2>
+      {% set counter = 0 %} {% for image in badImages %} {% if counter == 0 %}
+      <tr>
+        {% endif %}
+        <td>
+          <a href="/uploads/{{ image }}" target="_blank"><img src="{{ url_for('static', filename='images/'+image) }} " /></a>
+        </td>
+        {% if counter == 10 %} {% set counter = 0 %}
+      </tr>
+      {% endif %} {% endfor %}
+    </div>
 
-    <h1>Images Suggested For Deletion</h1>
-    {% for image in imageSuggestedForDeletion %}
-    <p>Hello {{ badImage }}</p>
-    <img src="{{ url_for('static', filename='images/'+image) }} " />
-    {% endfor %}
+    <br />
+    <br />
+    <div style="margin-left: 20px">
+      <h2>Images Suggested For Deletion</h2>
+      {% set counter = 0 %} {% for image in imageSuggestedForDeletion %} {% if counter == 0 %}
+      <tr>
+        {% endif %}
+        <td>
+          <a href="/uploads/{{ image }}" target="_blank"><img src="{{ url_for('static', filename='images/'+image) }} " /></a>
+        </td>
+        {% if counter == 10 %} {% set counter = 0 %}
+      </tr>
+      {% endif %} {% endfor %}
+    </div>
   </body>
 </html>
