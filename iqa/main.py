@@ -3,9 +3,23 @@ import numpy as np
 import cv2
 import os
 import glob
+import shutil
 from skimage import feature
-from iqa.jpeg_quality import jpegQuality
-from iqa.blur_quality import totalVariation,digModifiedLaplacian,svd
+from jpeg_quality import jpegQuality
+from blur_quality import totalVariation,digModifiedLaplacian,svd
+
+
+def check_directory_exists(path):
+    if os.path.exists(path):
+        shutil.rmtree(path)
+
+def saveImagesToDirectory(currentDirectoryPath, targetDirectoryPath, images):
+	os.chdir(targetDirectoryPath)
+	for imageName in images:
+		imagePath = currentDirectoryPath[:len(currentDirectoryPath)] + imageName
+		image = cv2.imread(imagePath)
+		cv2.imwrite(imageName,image)
+	
 
 def load_img(path_to_img):
     max_dim = 512
@@ -32,14 +46,12 @@ jpeg : compression inc - value inc
 '''
 
 
-def main():
+def classifyImages(imageDirectory):
 	totalVariationThreshold = 18917.27147
 	digModifiedLaplacianThreshold = 9.15444907
 	svdThreshold = 0.409693234
 	jpegThresholdLow  = 3.0190372085866
 	jpegThresholdUpper = 7.01
-	imageDirectory =r'E:/FinalYearProject/image_quality_assessment_final_year_project/iqa/static/images/*'
-	# imageDirectory =r'C:\Users\Jatin\OneDrive\Desktop\NR- IQA\static\images\*'
 	totalVariationWeight = 28.5014
 	digModifiedLaplacianWeight = 42.3033
 	svdWeight = 39.6645
@@ -47,7 +59,8 @@ def main():
 	badImages = []
 	goodImages = []
 	imageSuggestedForDeletion = []
-	print(len(images))
+
+	print("Total Images : ",len(images))
 
 	for image in images:
 		calculatedWeight = 0
@@ -82,10 +95,36 @@ def main():
 		else:
 			badImages.append(imageName)
 
-		print(image,calculatedWeight,jpegResult)
-	
-	print(goodImages)
-	print(badImages)
-	print(imageSuggestedForDeletion)
+		print("----------------------------------------------")
+		print("Image : ", imageName)
+		print("Blur Weight : ", calculatedWeight)
+		print("Jpeg Quality : ", jpegResult)
+		print("----------------------------------------------")
 	
 	return goodImages, badImages, imageSuggestedForDeletion
+
+def main():
+	# YOU NEED TO CHANGE THESE PATHS ACCORDING TO YOUR SYSTEM
+	GOOD_IMAGES_PATH = r'E:\Images\Results\goodImages'
+	BAD_IMAGES_PATH = r'E:\Images\Results\badImages'
+	IMAGE_SUGGESTED_FOR_DELETION_PATH = r'E:\Images\Results\imageSuggestedForDeletion'
+	imageDirectory =r'E:\Images\imagesToClassify\*'
+
+	goodImages, badImages, imageSuggestedForDelettion = classifyImages(imageDirectory)
+
+	check_directory_exists(GOOD_IMAGES_PATH)
+	check_directory_exists(BAD_IMAGES_PATH)
+	check_directory_exists(IMAGE_SUGGESTED_FOR_DELETION_PATH)
+
+	os.mkdir(GOOD_IMAGES_PATH)
+	os.mkdir(BAD_IMAGES_PATH)
+	os.mkdir(IMAGE_SUGGESTED_FOR_DELETION_PATH)
+
+	saveImagesToDirectory(imageDirectory,GOOD_IMAGES_PATH,goodImages)
+	saveImagesToDirectory(imageDirectory,BAD_IMAGES_PATH,badImages)
+	saveImagesToDirectory(imageDirectory,IMAGE_SUGGESTED_FOR_DELETION_PATH,imageSuggestedForDelettion)
+
+
+main()
+
+
